@@ -21,7 +21,7 @@ func (t *ServerGrls) run() {
 	router.HandleFunc("/except", t.grlsExceptToJson)
 	router.HandleFunc("/", indexHandler)
 	http.Handle("/", router)
-	if err := http.ListenAndServe(":9090", nil); err != nil {
+	if err := http.ListenAndServe(":8181", nil); err != nil {
 		Logging()
 		return
 	}
