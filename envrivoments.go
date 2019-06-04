@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,7 +13,18 @@ type Filelog string
 var DirLog = "log_server_grls"
 var DirTemp = "temp_server_grls"
 var FileLog Filelog
+var Port string
 
+func GetPort() {
+	flag.Parse()
+	ArgS := flag.Arg(0)
+	if ArgS == "" {
+		fmt.Println("server run on default port 8181")
+		Port = "8181"
+	} else {
+		Port = ArgS
+	}
+}
 func Logging(args ...interface{}) {
 	file, err := os.OpenFile(string(FileLog), os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 	defer file.Close()
