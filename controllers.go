@@ -7,6 +7,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"html/template"
 	"net/http"
+	"os/exec"
 	"strings"
 )
 
@@ -44,18 +45,24 @@ func (t *ServerGrls) grlsDateUpdate(w http.ResponseWriter, r *http.Request) {
 	t.grlsDate(w, r, GrlsTable)
 }
 
+func (t *ServerGrls) grlsDBUpdate(w http.ResponseWriter, r *http.Request) {
+	t.updateDB(w, r)
+}
+
 func (t *ServerGrls) grlsAll(w http.ResponseWriter, r *http.Request, table string) {
 	w.Header().Set("Content-Type", "application/json")
 	db, err := sql.Open("sqlite3", "file:grls.db?_journal_mode=OFF&_synchronous=OFF")
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
 	}
 	defer db.Close()
 	b, err := queryToJson(db, fmt.Sprintf("SELECT * FROM %s", table))
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
 	}
 	fmt.Fprint(w, b)
 }
@@ -77,6 +84,7 @@ func (t *ServerGrls) grlsListFromCode(w http.ResponseWriter, r *http.Request, ta
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
 
 	}
 	defer db.Close()
@@ -87,6 +95,7 @@ func (t *ServerGrls) grlsListFromCode(w http.ResponseWriter, r *http.Request, ta
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
 	}
 	if b == "null" {
 		w.WriteHeader(404)
@@ -104,12 +113,14 @@ func (t *ServerGrls) grlsFromCode(w http.ResponseWriter, r *http.Request, table 
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
 	}
 	defer db.Close()
 	b, err := queryToJson(db, fmt.Sprintf("SELECT * FROM %s WHERE code = $1", table), code)
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
 	}
 	if b == "null" {
 		w.WriteHeader(404)
@@ -127,12 +138,14 @@ func (t *ServerGrls) grlsDate(w http.ResponseWriter, r *http.Request, table stri
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
 	}
 	defer db.Close()
 	b, err := queryToJson(db, fmt.Sprintf("SELECT date_pub FROM %s LIMIT 1", table), code)
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
 	}
 	if b == "null" {
 		w.WriteHeader(404)
@@ -140,4 +153,37 @@ func (t *ServerGrls) grlsDate(w http.ResponseWriter, r *http.Request, table stri
 	} else {
 		fmt.Fprint(w, b)
 	}
+}
+
+func (t *ServerGrls) updateDB(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	vars := mux.Vars(r)
+	pass := vars["pass"]
+	if pass == "" {
+		fmt.Fprint(w, StringToJson(map[string]string{"Error": "Пуcтой параметр пароль"}))
+		return
+	}
+	if pass != SecretKey {
+		fmt.Fprint(w, StringToJson(map[string]string{"Error": "Неправильный пароль"}))
+		return
+	}
+	fileExec := vars["file"]
+	if fileExec == "" {
+		fmt.Fprint(w, StringToJson(map[string]string{"Error": "Пустой параметр файл"}))
+		return
+	}
+	cmd := exec.Command(fileExec)
+	err := cmd.Start()
+	if err != nil {
+		Logging(err)
+		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
+	}
+	err = cmd.Wait()
+	if err != nil {
+		Logging(err)
+		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
+		return
+	}
+	fmt.Fprint(w, StringToJson(map[string]string{"Ok": "Завершено успешно"}))
 }

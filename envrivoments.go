@@ -16,6 +16,7 @@ var FileLog Filelog
 var Port string
 var GrlsTable = "grls"
 var GrlsExceptTable = "grls_except"
+var SecretKey = "11111111" //change it
 
 func GetPort() {
 	flag.Parse()
