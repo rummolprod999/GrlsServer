@@ -38,3 +38,12 @@ func queryToJson(db *sql.DB, query string, args ...interface{}) (string, error) 
 	}
 	return string(b[:]), nil
 }
+
+func StringToJson(st map[string]string) string {
+	b, err := json.MarshalIndent(st, "", "\t")
+	if err != nil {
+		return err.Error()
+	} else {
+		return string(b[:])
+	}
+}
