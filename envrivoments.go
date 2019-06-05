@@ -14,6 +14,8 @@ var DirLog = "log_server_grls"
 var DirTemp = "temp_server_grls"
 var FileLog Filelog
 var Port string
+var GrlsTable = "grls"
+var GrlsExceptTable = "grls_except"
 
 func GetPort() {
 	flag.Parse()
