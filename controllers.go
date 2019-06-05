@@ -12,7 +12,7 @@ import (
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	data := "API GRLS"
-	tmpl, _ := template.New("data").Parse("<h1>{{ .}}</h1>Примеры:<p>GET /grls - возвращает весь список<p>GET /except - возвращает список исключенных<p>GET /grls/{штрих-код} - возвращает список по штрих-коду<p>GET /except/{штрих-код} - возвращает список исключенных по штрихкоду<p>POST /grlslist arr[0] = {code}, до 20 элементов<p>POST /exceptlist arr[0] = {code}, до 20 элементов")
+	tmpl, _ := template.New("data").Parse("<h1>{{ .}}</h1>Примеры:<p>GET /grls - возвращает весь список<p>GET /except - возвращает список исключенных<p>GET /grls/{штрих-код} - возвращает список по штрих-коду<p>GET /except/{штрих-код} - возвращает список исключенных по штрихкоду<p>POST /grlslist arr[0] = {code}, до 20 элементов<p>POST /exceptlist arr[0] = {code}, до 20 элементов<p>GET /dateup - дата последнего обновления списка грлс")
 	tmpl.Execute(w, data)
 }
 
