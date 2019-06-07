@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -82,9 +83,20 @@ func CreateTempDir() {
 		}
 	}
 }
+func GetPass() {
+	flag.Parse()
+	ArgS := strings.TrimSpace(flag.Arg(1))
+	if ArgS != "" {
+		SecretKey = ArgS
+		fmt.Println(fmt.Sprintf("Установлен пароль для обновления базы - %s", SecretKey))
+	} else {
+		fmt.Println(fmt.Sprintf("Пароль для обновления базы оставлен по умолчанию - %s", SecretKey))
+	}
+}
 
 func CreateEnv() {
 	CreateLogFile()
 	CreateTempDir()
 	GetPort()
+	GetPass()
 }
