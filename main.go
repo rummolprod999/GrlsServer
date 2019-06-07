@@ -4,7 +4,6 @@ import "fmt"
 
 func init() {
 	CreateEnv()
-	GetPort()
 }
 func main() {
 	defer SaveStack()

@@ -86,4 +86,5 @@ func CreateTempDir() {
 func CreateEnv() {
 	CreateLogFile()
 	CreateTempDir()
+	GetPort()
 }
