@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -18,6 +19,7 @@ var Port string
 var GrlsTable = "grls"
 var GrlsExceptTable = "grls_except"
 var SecretKey = "11111111" //change it
+var mutex sync.Mutex
 
 func GetPort() {
 	flag.Parse()
@@ -30,6 +32,7 @@ func GetPort() {
 	}
 }
 func Logging(args ...interface{}) {
+	mutex.Lock()
 	file, err := os.OpenFile(string(FileLog), os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 	defer file.Close()
 	if err != nil {
@@ -43,7 +46,7 @@ func Logging(args ...interface{}) {
 	}
 	//fmt.Fprintf(file, " %s", UrlXml)
 	fmt.Fprintln(file, "")
-
+	mutex.Unlock()
 }
 func CreateLogFile() {
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
