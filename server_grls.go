@@ -18,7 +18,7 @@ func (t *ServerGrls) run() {
 	router.HandleFunc("/exceptlist", t.grlsExceptListToJsonFromCode).Methods("POST")
 	router.HandleFunc("/except", t.grlsExceptToJson)
 	router.HandleFunc("/dateup", t.grlsDateUpdate)
-	router.HandleFunc(`/updatedb/{pass:\w+}/{file:\w+}`, t.grlsDBUpdate)
+	router.HandleFunc(`/updatedb/{pass}/{file}`, t.grlsDBUpdate)
 	router.HandleFunc("/", indexHandler)
 	http.Handle("/", router)
 	if err := http.ListenAndServe(t.Port, nil); err != nil {
