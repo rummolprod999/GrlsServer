@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"os"
@@ -20,6 +21,8 @@ var GrlsTable = "grls"
 var GrlsExceptTable = "grls_except"
 var SecretKey = "11111111" //change it
 var mutex sync.Mutex
+var FileDB = "grls.db"
+var ArZir = "file.zip"
 
 func GetPort() {
 	flag.Parse()
@@ -97,9 +100,79 @@ func GetPass() {
 	}
 }
 
+func CreateDB() {
+	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	fileDB := filepath.FromSlash(fmt.Sprintf("%s/%s", dir, FileDB))
+	if _, err := os.Stat(fileDB); os.IsNotExist(err) {
+		fmt.Println(err)
+		f, err := os.Create(fileDB)
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+		err = f.Chmod(0777)
+		if err != nil {
+			Logging(err)
+			//panic(err)
+		}
+		err = f.Close()
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+		db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+		defer db.Close()
+		_, err = db.Exec(`CREATE TABLE "grls" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"mnn"	TEXT,
+	"name"	TEXT,
+	"form"	TEXT,
+	"owner"	TEXT,
+	"atx"	TEXT,
+	"quantity"	INTEGER,
+	"max_price"	REAL,
+	"first_price"	REAL,
+	"ru"	TEXT,
+	"date_reg"	TEXT,
+	"code"	TEXT,
+	"date_pub"	TEXT
+)`)
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+		_, err = db.Exec(`CREATE TABLE "grls_except" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"mnn"	TEXT,
+	"name"	TEXT,
+	"form"	TEXT,
+	"owner"	TEXT,
+	"atx"	TEXT,
+	"quantity"	INTEGER,
+	"max_price"	REAL,
+	"first_price"	REAL,
+	"ru"	TEXT,
+	"date_reg"	TEXT,
+	"code"	TEXT,
+	"except_cause"	TEXT,
+	"except_date"	TEXT,
+	"date_pub"	TEXT
+)`)
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+	}
+}
+
 func CreateEnv() {
 	CreateLogFile()
 	CreateTempDir()
 	GetPort()
 	GetPass()
+	CreateDB()
 }
