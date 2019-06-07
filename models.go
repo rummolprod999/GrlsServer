@@ -194,5 +194,6 @@ func (t *ServerGrls) updateDB(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
 		return
 	}
+	Logging("Процесс обновления базы завершен")
 	fmt.Fprint(w, StringToJson(map[string]string{"Ok": "Завершено успешно"}))
 }
