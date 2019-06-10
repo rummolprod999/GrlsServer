@@ -108,17 +108,13 @@ func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
 		Logging(err)
 		return
 	}
-	datePub := findFromRegExp(sheet.Row(0).Col(0), `(\d{2}\.\d{2}\.\d{4})`)
-	for r := 3; r < int(sheet.MaxRow); r++ {
+	datePub := FindFromRegExp(sheet.Row(0).Col(0), `(\d{2}\.\d{2}\.\d{4})`)
+	for r := 3; r <= int(sheet.MaxRow); r++ {
 		col := sheet.Row(r)
-		mnn := strings.ReplaceAll(col.Col(0), "\u0000", "")
-		mnn = strings.ReplaceAll(mnn, "\u0026", "")
-		name := strings.ReplaceAll(col.Col(1), "\u0000", "")
-		name = strings.ReplaceAll(name, "\u0000", "")
-		form := strings.ReplaceAll(col.Col(2), "\u0000", "")
-		form = strings.ReplaceAll(form, "\u0026", "")
-		owner := strings.ReplaceAll(col.Col(3), "\u0000", "")
-		owner = strings.ReplaceAll(owner, "\u0026", "")
+		mnn := ReplaceBadSymbols(col.Col(0))
+		name := ReplaceBadSymbols(col.Col(1))
+		form := ReplaceBadSymbols(col.Col(2))
+		owner := ReplaceBadSymbols(col.Col(3))
 		atx := col.Col(4)
 		quantity := col.Col(5)
 		maxPrice := strings.ReplaceAll(col.Col(6), ",", ".")
@@ -146,20 +142,16 @@ func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
 		Logging(err)
 		return
 	}
-	datePub := findFromRegExp(sheet.Row(0).Col(0), `(\d{2}\.\d{2}\.\d{4})`)
+	datePub := FindFromRegExp(sheet.Row(0).Col(0), `(\d{2}\.\d{2}\.\d{4})`)
 	if datePub == "" {
 		Logging("datePub is empty")
 	}
-	for r := 3; r < int(sheet.MaxRow); r++ {
+	for r := 3; r <= int(sheet.MaxRow); r++ {
 		col := sheet.Row(r)
-		mnn := strings.ReplaceAll(col.Col(0), "\u0000", "")
-		mnn = strings.ReplaceAll(mnn, "\u0026", "")
-		name := strings.ReplaceAll(col.Col(1), "\u0000", "")
-		name = strings.ReplaceAll(name, "\u0000", "")
-		form := strings.ReplaceAll(col.Col(2), "\u0000", "")
-		form = strings.ReplaceAll(form, "\u0026", "")
-		owner := strings.ReplaceAll(col.Col(3), "\u0000", "")
-		owner = strings.ReplaceAll(owner, "\u0026", "")
+		mnn := ReplaceBadSymbols(col.Col(0))
+		name := ReplaceBadSymbols(col.Col(1))
+		form := ReplaceBadSymbols(col.Col(2))
+		owner := ReplaceBadSymbols(col.Col(3))
 		atx := col.Col(4)
 		quantity := col.Col(5)
 		maxPrice := strings.ReplaceAll(col.Col(6), ",", ".")
@@ -168,7 +160,7 @@ func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
 		dateReg := col.Col(9)
 		code := col.Col(10)
 		exceptCause := col.Col(11)
-		exceptDate := findFromRegExp(col.Col(13), `(\d{2}\.\d{2}\.\d{4})`)
+		exceptDate := FindFromRegExp(col.Col(13), `(\d{2}\.\d{2}\.\d{4})`)
 		if exceptDate == "" {
 			Logging(fmt.Sprintf("exceptDate is empty, row %d, mnn - %s", r, mnn))
 		}
