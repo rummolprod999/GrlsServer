@@ -2,19 +2,18 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/extrame/xls"
-	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
 type GrlsReader struct {
-	Url   string
-	Added int
+	Url         string
+	Added       int
+	AddedExcept int
 }
 
 func (t *GrlsReader) reader() {
@@ -98,7 +97,7 @@ func (t *GrlsReader) extractXlsData(nameFile string) {
 }
 
 func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
-	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+	db, err := dbConnection()
 	if err != nil {
 		Logging(err)
 		return
@@ -136,7 +135,7 @@ func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
 }
 
 func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
-	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+	db, err := dbConnection()
 	if err != nil {
 		Logging(err)
 		return
@@ -174,7 +173,7 @@ func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
 			Logging(fmt.Sprintf("exceptDate is empty, row %d, mnn - %s", r, mnn))
 		}
 		_, err := db.Exec("INSERT INTO grls_except (id, mnn, name, form, owner, atx, quantity, max_price, first_price, ru, date_reg, code, except_cause, except_date, date_pub) VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)", mnn, name, form, owner, atx, quantity, maxPrice, firstPrice, ru, dateReg, code, exceptCause, exceptDate, datePub)
-		t.Added++
+		t.AddedExcept++
 		if err != nil {
 			Logging(err)
 		}

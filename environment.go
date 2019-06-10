@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,6 +24,11 @@ var SecretKey = "11111111" //change it
 var mutex sync.Mutex
 var FileDB = "grls.db"
 var ArZir = "file.zip"
+
+func dbConnection() (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+	return db, err
+}
 
 func GetPort() {
 	flag.Parse()
@@ -120,7 +126,7 @@ func CreateDB() {
 			Logging(err)
 			panic(err)
 		}
-		db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+		db, err := dbConnection()
 		if err != nil {
 			Logging(err)
 			panic(err)

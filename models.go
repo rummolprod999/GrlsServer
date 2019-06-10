@@ -56,7 +56,7 @@ func StringToJson(st map[string]string) string {
 func (t *ServerGrls) grlsAll(w http.ResponseWriter, r *http.Request, table string) {
 	defer SaveStack()
 	w.Header().Set("Content-Type", "application/json")
-	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+	db, err := dbConnection()
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
@@ -86,7 +86,7 @@ func (t *ServerGrls) grlsListFromCode(w http.ResponseWriter, r *http.Request, ta
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": "Слишком мало агрументов в запросе"}))
 		return
 	}
-	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+	db, err := dbConnection()
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
@@ -116,7 +116,7 @@ func (t *ServerGrls) grlsFromCode(w http.ResponseWriter, r *http.Request, table 
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	code := strings.TrimSpace(vars["code"])
-	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+	db, err := dbConnection()
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
@@ -140,7 +140,7 @@ func (t *ServerGrls) grlsFromCode(w http.ResponseWriter, r *http.Request, table 
 func (t *ServerGrls) grlsDate(w http.ResponseWriter, r *http.Request, table string) {
 	defer SaveStack()
 	w.Header().Set("Content-Type", "application/json")
-	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
+	db, err := dbConnection()
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
@@ -175,9 +175,10 @@ func (t *ServerGrls) updateDB(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	Logging("Процесс обновления базы запущен")
-	reader := GrlsReader{Url: "https://grls.rosminzdrav.ru/pricelims.aspx", Added: 0}
+	reader := GrlsReader{Url: "https://grls.rosminzdrav.ru/pricelims.aspx", Added: 0, AddedExcept: 0}
 	reader.reader()
 	Logging("Процесс обновления базы завершен")
 	Logging(fmt.Sprintf("Добавлено %d элементов", reader.Added))
+	Logging(fmt.Sprintf("Добавлено %d исключенных элементов", reader.AddedExcept))
 	fmt.Fprint(w, StringToJson(map[string]string{"Ok": "Завершено успешно"}))
 }
