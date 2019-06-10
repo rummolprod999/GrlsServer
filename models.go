@@ -5,13 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	_ "github.com/mattn/go-sqlite3"
 	"net/http"
 	"reflect"
 	"strings"
 )
 
-func queryToJson(db *sql.DB, query string, args ...interface{}) (string, error) {
+func QueryToJson(db *sql.DB, query string, args ...interface{}) (string, error) {
 	var objects []map[string]interface{}
 
 	rows, err := db.Query(query, args...)
@@ -56,14 +55,14 @@ func StringToJson(st map[string]string) string {
 func (t *ServerGrls) grlsAll(w http.ResponseWriter, r *http.Request, table string) {
 	defer SaveStack()
 	w.Header().Set("Content-Type", "application/json")
-	db, err := dbConnection()
+	db, err := DbConnection()
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
 		return
 	}
 	defer db.Close()
-	b, err := queryToJson(db, fmt.Sprintf("SELECT * FROM %s", table))
+	b, err := QueryToJson(db, fmt.Sprintf("SELECT * FROM %s", table))
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
@@ -86,7 +85,7 @@ func (t *ServerGrls) grlsListFromCode(w http.ResponseWriter, r *http.Request, ta
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": "Слишком мало агрументов в запросе"}))
 		return
 	}
-	db, err := dbConnection()
+	db, err := DbConnection()
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
@@ -97,7 +96,7 @@ func (t *ServerGrls) grlsListFromCode(w http.ResponseWriter, r *http.Request, ta
 	query := "SELECT * FROM " + table + " WHERE code IN (?" + strings.Repeat(",?", len(params)-1) + ")"
 	args := []interface{}{}
 	args = append(args, params...)
-	b, err := queryToJson(db, query, args...)
+	b, err := QueryToJson(db, query, args...)
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
@@ -116,14 +115,14 @@ func (t *ServerGrls) grlsFromCode(w http.ResponseWriter, r *http.Request, table 
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	code := strings.TrimSpace(vars["code"])
-	db, err := dbConnection()
+	db, err := DbConnection()
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
 		return
 	}
 	defer db.Close()
-	b, err := queryToJson(db, fmt.Sprintf("SELECT * FROM %s WHERE code = $1", table), code)
+	b, err := QueryToJson(db, fmt.Sprintf("SELECT * FROM %s WHERE code = $1", table), code)
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
@@ -140,14 +139,14 @@ func (t *ServerGrls) grlsFromCode(w http.ResponseWriter, r *http.Request, table 
 func (t *ServerGrls) grlsDate(w http.ResponseWriter, r *http.Request, table string) {
 	defer SaveStack()
 	w.Header().Set("Content-Type", "application/json")
-	db, err := dbConnection()
+	db, err := DbConnection()
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))
 		return
 	}
 	defer db.Close()
-	b, err := queryToJson(db, fmt.Sprintf("SELECT date_pub FROM %s LIMIT 1", table))
+	b, err := QueryToJson(db, fmt.Sprintf("SELECT date_pub FROM %s LIMIT 1", table))
 	if err != nil {
 		Logging(err)
 		fmt.Fprint(w, StringToJson(map[string]string{"Error": err.Error()}))

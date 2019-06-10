@@ -97,7 +97,7 @@ func (t *GrlsReader) extractXlsData(nameFile string) {
 }
 
 func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
-	db, err := dbConnection()
+	db, err := DbConnection()
 	if err != nil {
 		Logging(err)
 		return
@@ -135,7 +135,7 @@ func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
 }
 
 func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
-	db, err := dbConnection()
+	db, err := DbConnection()
 	if err != nil {
 		Logging(err)
 		return

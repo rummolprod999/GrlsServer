@@ -25,7 +25,7 @@ var mutex sync.Mutex
 var FileDB = "grls.db"
 var ArZir = "file.zip"
 
-func dbConnection() (*sql.DB, error) {
+func DbConnection() (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal_mode=OFF&_synchronous=OFF", FileDB))
 	return db, err
 }
@@ -126,7 +126,7 @@ func CreateDB() {
 			Logging(err)
 			panic(err)
 		}
-		db, err := dbConnection()
+		db, err := DbConnection()
 		if err != nil {
 			Logging(err)
 			panic(err)
