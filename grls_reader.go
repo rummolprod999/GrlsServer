@@ -110,7 +110,7 @@ func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
 		return
 	}
 	datePub := findFromRegExp(sheet.Row(0).Col(0), `(\d{2}\.\d{2}\.\d{4})`)
-	for r := 3; r <= int(sheet.MaxRow); r++ {
+	for r := 3; r < int(sheet.MaxRow); r++ {
 		col := sheet.Row(r)
 		mnn := strings.ReplaceAll(col.Col(0), "\u0000", "")
 		mnn = strings.ReplaceAll(mnn, "\u0026", "")
@@ -151,7 +151,7 @@ func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
 	if datePub == "" {
 		Logging("datePub is empty")
 	}
-	for r := 3; r <= int(sheet.MaxRow); r++ {
+	for r := 3; r < int(sheet.MaxRow); r++ {
 		col := sheet.Row(r)
 		mnn := strings.ReplaceAll(col.Col(0), "\u0000", "")
 		mnn = strings.ReplaceAll(mnn, "\u0026", "")
