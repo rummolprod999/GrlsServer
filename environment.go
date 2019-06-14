@@ -106,7 +106,7 @@ func GetPass() {
 	}
 }
 
-func CreateDB() {
+func CreateNewDB() {
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	fileDB := filepath.FromSlash(fmt.Sprintf("%s/%s", dir, FileDB))
 	if _, err := os.Stat(fileDB); os.IsNotExist(err) {
@@ -180,5 +180,5 @@ func CreateEnv() {
 	CreateTempDir()
 	GetPort()
 	GetPass()
-	CreateDB()
+	CreateNewDB()
 }
