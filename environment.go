@@ -110,7 +110,7 @@ func CreateNewDB() {
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	fileDB := filepath.FromSlash(fmt.Sprintf("%s/%s", dir, FileDB))
 	if _, err := os.Stat(fileDB); os.IsNotExist(err) {
-		fmt.Println(err)
+		Logging(err)
 		f, err := os.Create(fileDB)
 		if err != nil {
 			Logging(err)
@@ -167,6 +167,34 @@ func CreateNewDB() {
 	"except_cause"	TEXT,
 	"except_date"	TEXT,
 	"date_pub"	TEXT
+)`)
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+		_, err = db.Exec(`CREATE INDEX "code" ON "grls" (
+	"code"
+)`)
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+		_, err = db.Exec(`CREATE INDEX "code_except" ON "grls_except" (
+	"code"
+)`)
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+		_, err = db.Exec(`CREATE UNIQUE INDEX "primary" ON "grls" (
+	"id"
+)`)
+		if err != nil {
+			Logging(err)
+			panic(err)
+		}
+		_, err = db.Exec(`CREATE UNIQUE INDEX "primary_except" ON "grls_except" (
+	"id"
 )`)
 		if err != nil {
 			Logging(err)
